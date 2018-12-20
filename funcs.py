@@ -39,12 +39,23 @@ def get_thresh_edge_vals(img):
 #     return cv2.addWeighted(image, 0.8, line_image, 1, 0)
 
 
+def create_ellipse_mask(w,h, inv = False):
+    if inv == True:
+        bg_color = 255
+        el_color = (0,0,0)
+    else:
+        bg_color = 0
+        el_color = (255,255,255)
+
+    blank_image = np.full((h, w), bg_color, dtype = np.uint8)
+    return cv2.ellipse(blank_image, (w/2,h/2), (h/2,w/4),0,0,360, el_color, -1)
+
 def get_chess_grid_coords(img, number_of_rects, *args, **kwargs):
     if len(args) >= 2:
         h, w = args[0], args[1]
     else:
         h, w = img.shape[0], img.shape[1]
-        
+
     print(kwargs)
     if 'indent' in kwargs and kwargs.get('indent') == False:
         x_Arr = np.linspace(0, w, num = number_of_rects+3, dtype=np.uint16)
@@ -56,12 +67,7 @@ def get_chess_grid_coords(img, number_of_rects, *args, **kwargs):
     coord_list = []
     for i in range(len(y_Arr)-1):
         for j in range(len(x_Arr)-1):
-            if j%2 == 1 and i%2 == 1:
-                coord_list.append([x_Arr[j], y_Arr[i]])
-                coord_list.append([x_Arr[j+1], y_Arr[i]])
-                coord_list.append([x_Arr[j+1], y_Arr[i+1]])
-                coord_list.append([x_Arr[j], y_Arr[i+1]])
-            elif j%2 == 0 and i%2 == 0:
+            if j%2 == 1 and i%2 == 1 or j%2 == 0 and i%2 == 0:
                 coord_list.append([x_Arr[j], y_Arr[i]])
                 coord_list.append([x_Arr[j+1], y_Arr[i]])
                 coord_list.append([x_Arr[j+1], y_Arr[i+1]])
